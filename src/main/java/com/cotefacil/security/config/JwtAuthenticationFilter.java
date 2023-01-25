@@ -16,6 +16,8 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private final JwtService jwtService;
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -23,6 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader(AUTHORIZATION);
         final String jwt;
+        final String username;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -30,5 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //        jwt = authHeader.substring(7);
 //        jwt = authHeader.replace("Bearer ", "");
         jwt = authHeader.substring("Bearer ".length());
+        // todo extract the userEmail from JWT token;
+        username = jwtService.extractUsername(jwt);
     }
 }
